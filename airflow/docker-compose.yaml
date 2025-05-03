@@ -1,0 +1,21 @@
+version: '3'
+
+services:
+  airflow:
+    image: apache/airflow:2.8.1-python3.10
+    container_name: airflow
+    restart: always
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=SequentialExecutor
+      - AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION=false
+      - AIRFLOW__CORE__LOAD_EXAMPLES=false
+      - DBT_PROFILES_DIR=/opt/airflow/dbt  # important
+    volumes:
+      - ../snowflake_data_project:/opt/airflow/dbt
+      - ./dags:/opt/airflow/dags
+    ports:
+      - "8080:8080"
+    command: >
+      bash -c "airflow db init &&
+               airflow users create --username admin --password admin --firstname kaouther --lastname saoula --role Admin --email saoula.kaouther@gmail.com &&
+               airflow webserver"
